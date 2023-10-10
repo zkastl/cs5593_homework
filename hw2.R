@@ -14,11 +14,9 @@ milk_norm <- rnorm(220, mean=mean(data$Milk, na.rm=TRUE), sd=sd(data$Milk, na.rm
 fresh_norm <- rnorm(220, mean=mean(data$Fresh), sd=sd(data$Fresh))
 deli_norm <- rnorm(220, mean=mean(data$Delicassen), sd=sd(data$Delicassen))
 
-b <- boxplot(data$Milk, data$Fresh, data$Delicassen,
+b <- boxplot(milk_norm, fresh_norm, deli_norm,
         main="Normalized Values for Attributes",
         at=c(1,2,3),
         names=c("Milk", "Fresh", "Delicassen"),
         las=3, col=c("red", "blue", "green"),
         notch=TRUE, horizontal=TRUE)
-
-#m <- boxplot(min_max_norm(data$Milk), names=c("Milk"), las=1, col=c("red"), notch=TRUE)
