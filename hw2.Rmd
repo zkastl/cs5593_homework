@@ -1,0 +1,184 @@
+---
+title: "CS5593 HW2 - Kastl"
+author: "Zak Kastl"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Setup code
+library(C50)
+library(rpart)
+
+data_file <- 
+  "C:/Users/zkast/source/repos/cs5593_homework/Wholesale customers data.csv"
+
+data <- read.table(data_file, sep = ",", header = TRUE, na.strings = "?")
+data2 <- data[, c("Milk", "Fresh", "Delicassen")]
+```
+
+## Question 1
+
+(Rephrased from the original homework assignment text for brevity)
+
+Use ChatGPT to help you use Decision Tree Induction to help classify new email messages as "spam" or "not spam".
+
+### Prompt 1
+
+> How should I approach using Decision Tree Induction to automatically classify new email messages as "spam" or "not spam"?
+
+### Answer
+
+> Using Decision Tree Induction for automatically classifying email messages as "spam" or "not spam" is a common application of machine learning. Here's a step-by-step approach to tackle this problem:
+>
+> 1.  **Data Collection and Preprocessing:**
+>     -   Gather a labeled dataset of email messages, where each email is marked as either "spam" or "not spam" (ham).
+>
+>     -   Preprocess the email data by removing HTML tags, special characters, and any unnecessary whitespace. Tokenize the text, and convert it to lowercase for consistency.
+>
+> 2.  **Feature Extraction**
+>
+>     Extract relevant features from the email messages. Some common features include:
+>
+>     -   Word frequencies: Count the occurrence of words in the email.
+>
+>     -   Character frequencies: Count the occurrence of specific characters or patterns.
+>
+>     -   Header information: Analyze email headers, sender information, and timestamps.
+>
+>     -   Email length: Measure the length of the email message.
+>
+>     -   Presence of hyperlinks and attachments: Check if the email contains these elements.
+>
+>     -   Other domain-specific features: Consider other features relevant to your dataset.
+>
+> 3.  **Data Splitting**
+>
+>     Split your dataset into a training set and a testing set. A common split is 80% for training and 20% for testing, but you can adjust this based on your dataset size.
+>
+> 4.  **Decision Tree Induction**:
+>
+>     Use a machine learning library (e.g., scikit-learn in Python) to build a decision tree classifier. Decision trees are a good choice for this task because they are interpretable and can handle both categorical and numerical features.
+>
+> 5.  **Training:**
+>
+>     Train your decision tree model on the training data using the labeled examples. The algorithm will learn to make decisions based on the selected features.
+>
+> 6.  **Hyperparameter Tuning**:
+>
+>     Experiment with different hyperparameters like tree depth, minimum samples per leaf, and criterion (e.g., Gini impurity or entropy). Use cross-validation to find the best combination of hyperparameters.
+>
+> 7.  **Evaluation**:
+>
+>     Evaluate the model's performance on the testing set using appropriate evaluation metrics, such as accuracy, precision, recall, F1-score, and ROC-AUC. This will help you understand how well your model is doing.
+>
+> 8.  **Fine-Tuning and Iteration:**
+>
+>     Based on the evaluation results, you may need to adjust your feature selection, model parameters, or even consider using other machine learning algorithms (e.g., Random Forests, Gradient Boosting) for improved performance.
+>
+> 9.  **Deployment:**
+>
+>     Once you are satisfied with the model's performance, you can deploy it to automatically classify incoming email messages as "spam" or "not spam."
+>
+> 10. **Monitoring and Maintenance**:
+>
+>     Continuously monitor the model's performance in a production environment and retrain it periodically with new data to adapt to changing spam patterns.
+>
+> 11. **Handling Imbalanced Data**:
+>
+>     Consider techniques to address class imbalance, such as oversampling, undersampling, or using different evaluation metrics like precision-recall curves when dealing with imbalanced classes.
+>
+> 12. **Legal and Ethical Considerations**:
+>
+>     Ensure your email classification system complies with privacy and legal regulations. Respect user consent and privacy when processing email data.
+>
+> Remember that email spam classification is an evolving field, and new spam techniques are constantly emerging. Regularly update and retrain your model to adapt to changing spam patterns.
+
+This answer is a rather good answer, and
+
+## Question 2
+
+## Question 3
+### Question 3.1
+
+
+### Question 3.2
+a.  Draw a boxplot for the following attributes: Milk, Fresh, Delicatessen
+
+    ```{r}
+    b <- boxplot(data2,main="Raw Boxplots for Attributes: Milk, Fresh, Delicassen",at=c(1,2,3),names=c("Milk", "Fresh", "Delicassen"),las=3, col=c("red", "blue", "green"),notch=TRUE, horizontal=TRUE)
+    ```
+
+b.  Identify which attributes have outliers, which attribute values are outliers and justify. Remove the entire tuples containing the outliers from the dataset and print the dataset after the tuples have been removed.
+
+```{r}
+show(b$out)
+
+quartiles_milk <- quantile(data$Milk, probs=c(.25,.75))
+milk_iqr <- IQR(data$Milk)
+milk_lower <- quartiles_milk[1] - 1.5*milk_iqr
+milk_upper <- quartiles_milk[2] + 1.5*milk_iqr
+milk_no_outlier <- subset(data$Milk,
+                          data$Milk > milk_lower & data$Milk < milk_upper)
+
+quartiles_fresh <- quantile(data$Fresh, probs=c(.25,.75))
+fresh_iqr <- IQR(data$Fresh)
+fresh_lower <- quartiles_fresh[1] - 1.5*fresh_iqr
+fresh_upper <- quartiles_fresh[2] + 1.5*fresh_iqr
+fresh_no_outlier <- subset(data$Fresh,
+                          data$Fresh > fresh_lower & data$Fresh < fresh_upper)
+
+quartiles_deli <- quantile(data$Delicassen, probs=c(.25,.75))
+deli_iqr <- IQR(data$Delicassen)
+deli_lower <- quartiles_deli[1] - 1.5*deli_iqr
+deli_upper <- quartiles_deli[2] + 1.5*deli_iqr
+deli_no_outlier <- 
+  subset(data$Delicassen, data$Delicassen > deli_lower & data$Delicassen < deli_upper)
+
+data3 <- data[which((data$Milk > milk_lower & data$Milk < milk_upper) &
+            (data$Delicassen > deli_lower & data$Delicassen < deli_upper) &
+              (data$Fresh > fresh_lower & data$Fresh < fresh_upper)),]
+
+show(data3)
+```
+
+c.  Repeat (a) with the new dataset from (b) and provide interpretation of the new boxplots.
+
+```{r}
+b2 <- boxplot(data3[,c("Milk", "Fresh", "Delicassen")],
+             main="Values for Milk, Fresh, Delicassen (Outliers Removed)",
+             at=c(1,2,3),
+             names=c("Milk", "Fresh", "Delicassen"),
+             las=3, col=c("red", "blue", "green"),
+             notch=TRUE, horizontal=TRUE)
+```
+
+Interestingly, there are still outliers in the boxplots after the outliers have been removed according to the IQR technique. If you run a histogram of the data before and after removing the outliers, you get the following plots:
+```{r}
+hist(data2$Milk)
+hist(data3$Milk)
+```
+
+This is not a normal distribution, but most likely a log-normal or exponential distribution. Not all outliers are removed, but a large portion are.
+
+d.  Use the pre-processed dataset from (b) to run the C5.0 Algorithm, build a decision tree that classifies the tuples based on the class attribute "Region". Print the decision tree graphically, and evaluate the error-rate using k-fold cross-validation with k=3. For each fold, print the confusion matrix to output, calc print store error rate.
+
+```{r}
+vars <- c("Milk", "Fresh", "Delicassen")
+str(data3[, c(vars, "Region")])
+set.seed(1111)
+in_train <- sample(1:nrow(data3), size=266)
+train_data <- data3[in_train,]
+test_data <- data3[-in_train,]
+train_data$Region <- as.factor(train_data$Region)
+tree_mod <- C5.0(x=train_data[,vars], y=train_data$Region)
+summary(tree_mod)
+```
+
+e. Repeat (d) for CART
+
