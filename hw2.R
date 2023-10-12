@@ -22,22 +22,20 @@ quartiles_milk <- quantile(data$Milk, probs=c(.25,.75))
 milk_iqr <- IQR(data$Milk)
 milk_lower <- quartiles_milk[1] - 1.5*milk_iqr
 milk_upper <- quartiles_milk[2] + 1.5*milk_iqr
-milk_no_outlier <- subset(data$Milk,
-                          data$Milk > milk_lower & data$Milk < milk_upper)
+milk_no_outlier <- data$Milk[data$Milk > milk_lower & data$Milk < milk_upper]
 
 quartiles_fresh <- quantile(data$Fresh, probs=c(.25,.75))
 fresh_iqr <- IQR(data$Fresh)
 fresh_lower <- quartiles_fresh[1] - 1.5*fresh_iqr
 fresh_upper <- quartiles_fresh[2] + 1.5*fresh_iqr
-fresh_no_outlier <- subset(data$Fresh,
-                          data$Fresh > fresh_lower & data$Fresh < fresh_upper)
+fresh_no_outlier <- data$Fresh[data$Fresh > fresh_lower & data$Fresh < fresh_upper]
 
 quartiles_deli <- quantile(data$Delicassen, probs=c(.25,.75))
 deli_iqr <- IQR(data$Delicassen)
 deli_lower <- quartiles_deli[1] - 1.5*deli_iqr
 deli_upper <- quartiles_deli[2] + 1.5*deli_iqr
-deli_no_outlier <- 
-  subset(data$Delicassen, data$Delicassen > deli_lower & data$Delicassen < deli_upper)
+deli_no_outlier <-data$Delicassen[data$Delicassen > deli_lower & 
+                                    data$Delicassen < deli_upper]
 
 data3 <- data[which((data$Milk > milk_lower & data$Milk < milk_upper) &
             (data$Delicassen > deli_lower & data$Delicassen < deli_upper) &
@@ -61,4 +59,11 @@ train_data <- data3[in_train,]
 test_data <- data3[-in_train,]
 train_data$Region <- as.factor(train_data$Region)
 tree_mod <- C5.0(x=train_data[,vars], y=train_data$Region)
-summary(tree_mod)
+plot(tree_mod)
+
+#x
+min_max_norm <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+norm <- as.data.frame(lapply(data, min_max_norm))
